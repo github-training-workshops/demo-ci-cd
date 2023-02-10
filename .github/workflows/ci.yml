@@ -63,17 +63,18 @@ jobs:
     environment:
       name: test-env
       # Environment URL can be dynamic
-      url: https://${{ env.BASE_URL }}.test.company
+      url: https://${{ env.BASE_URL}}.test.company
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       
-      # Determining hte target URL can for example be done in a separate step like this
+      # Determining the target URL can for example be done in a separate step like this
       - name: Determine base url
         id: determine_url
         run: |
           echo "Determining base URL according to some criteria..."
-          echo "BASE_URL="site1"" >> $GITHUB_ENV
+          echo "BASE_URL=${{ vars.SITE_URL }}" >> $GITHUB_ENV
+          echo ${{ vars.SITE_URL }}
           
       # Placeholder - this step would be some action or run commands that deploys the code
       - name: Deploy to test env
@@ -81,6 +82,40 @@ jobs:
         run: |
           echo "Deploying to test environment - ${{ env.BASE_URL }}..."
           echo "This step would be replaced with e.g. a Marketplace Action for deploying to some target test env..."
+      
+      # Download and pack the code
+      - name: Upload artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: my-test-artifact
+          path: dist/
+          
+  deploy-uat:
+    name: Deploy to uat env
+    runs-on: ubuntu-latest
+    needs: [lint, ci, deploy-test]
+    environment:
+      name: uat-env
+      # Environment URL can be dynamic
+      url: https://${{ env.BASE_URL }}.test.company
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      # Determining the target URL can for example be done in a separate step like this
+      - name: Determine base url
+        id: determine_url
+        run: |
+          echo "Determining base URL according to some criteria..."
+          echo "BASE_URL=${{ vars.SITE_URL }}" >> $GITHUB_ENV
+          
+      # Placeholder - this step would be some action or run commands that deploys the code
+      - name: Deploy to test env
+        if: ${{ success() }}
+        run: |
+          echo "Deploying to UAT environment - ${{ env.BASE_URL }}..."
+          echo "This step would be replaced with e.g. a Marketplace Action for deploying to some target UAT env..."
       
       # Download and pack the code
       - name: Upload artifact
