@@ -25,7 +25,8 @@ jobs:
         id: determine_url
         run: |
           echo "Determining base URL according to some criteria..."
-          echo "BASE_URL="site123"" >> $GITHUB_ENV
+          #echo "BASE_URL="site123"" >> $GITHUB_ENV
+          echo "BASE_URL="${{ vars.SITE_URL }}"" >> $GITHUB_ENV
       
       - name: Deploy to production
         if: ${{ success() }}
